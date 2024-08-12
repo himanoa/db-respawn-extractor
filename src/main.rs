@@ -19,7 +19,7 @@ fn main() {
         }
     };
     let map_image = convert_image_to_mat(pre_process(image, file_name.to_string(), true));
-    println!("{:?}", get_cordinate(map_image))
+    println!("player_marker_cordinate: {:?}", get_cordinate(map_image))
 }
 
 struct Rgb(usize, usize, usize);
