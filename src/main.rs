@@ -19,12 +19,14 @@ fn main() {
         }
     };
     let map_image = convert_image_to_mat(pre_process(image, file_name.to_string(), true));
-    println!("player_marker_cordinate: {:?}", get_cordinate(map_image))
+    let cordinate = get_cordinate(map_image);
+    let interactive_map_cordinate = InteractiveMapCordinate::from(cordinate);
+    println!("player_marker_cordinate: {},{}", cordinate.0, cordinate.1);
+    println!("player_marker_cordinate(interactive_map_feedback_format): {},{}", interactive_map_cordinate.0, interactive_map_cordinate.1);
 }
 
 struct Rgb(usize, usize, usize);
 struct Bgr(f64, f64, f64);
-
 
 impl Rgb {
     fn to_bgr(&self) -> Bgr {
@@ -121,7 +123,7 @@ fn convert_image_to_mat(image: DynamicImage) -> Mat {
     mat
 }
 
-fn get_cordinate(mat: Mat) -> (i32, i32) {
+fn get_cordinate(mat: Mat) -> Cordinate {
     let red = Rgb(157, 45, 41);
     let red_bgr = red.to_bgr();
     const RANGE: f64 = 30.0;
@@ -149,6 +151,19 @@ fn get_cordinate(mat: Mat) -> (i32, i32) {
         }).collect::<Vec<_>>();
 
     let rect = targets[0];
-    (rect.x + rect.width / 2, rect.y + rect.height / 2)
+    Cordinate(rect.x + rect.width / 2, rect.y + rect.height / 2)
+}
+
+
+#[derive(Debug, Clone, Copy)]
+struct Cordinate(i32, i32);
+
+#[derive(Debug, Clone, Copy)]
+struct InteractiveMapCordinate(i32, i32);
+
+impl From<Cordinate> for InteractiveMapCordinate {
+    fn from(value: Cordinate) -> Self {
+        InteractiveMapCordinate(value.0, 400 - value.1)
+    }
 }
 
